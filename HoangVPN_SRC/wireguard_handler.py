@@ -40,8 +40,21 @@ def is_app_installed():
 
     
 def main():
-    subprocess.run(["redistx64.exe", "/q", "/norestart"], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
-    subprocess.run(["redistx86.exe", "/q", "/norestart"], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+    try:
+        subprocess.run(["redistx64.exe", "/q", "/norestart"], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+    except subprocess.CalledProcessError as e:
+        if e.returncode == 3010:
+            pass # request reboot, it ok to passed
+        else:
+            raise # re-raise
+    
+    try:
+        subprocess.run(["redistx86.exe", "/q", "/norestart"], check=True, creationflags=subprocess.CREATE_NO_WINDOW)
+    except subprocess.CalledProcessError as e:
+        if e.returncode == 3010:
+            pass # request reboot, it ok to passed
+        else:
+            raise # re-raise
     
     wireguard, wiresock = is_app_installed()
     if not wireguard:
